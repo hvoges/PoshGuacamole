@@ -7,7 +7,7 @@ https://github.com/ridvanaltun/guacamole-rest-api-documentation/tree/master/docs
 My Thanks go to Adicitus who made me aware of the Web-Api and who has his own Project which you can find here: https://github.com/Adicitus/ps-guacamole-api.
 
 ## Usage 
-Before you can use the module, you first have to create an Access-Token for the Web-API with Get-GuacamoleAuthToken. 
+Before you can use the module, you first have to create an Access-Token for the Web-API with Connect-Guacamole.
 
 ```
 $token = Get-GuacamoleAuthToken -HostUrl <URL to you Guacamole-Server> -Username <your admin user> -Password <Password>
