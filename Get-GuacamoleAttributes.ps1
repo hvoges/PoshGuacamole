@@ -1,25 +1,41 @@
 function Get-GuacamoleAttributes {
 <#
 .SYNOPSIS
-    Open a Object to your Guacamole-Server 
+    Gets the Object-Attributes from the JSON-String and adds them as Properties
 .DESCRIPTION
-    This Cmdlet gets an Authentication-Token for the Guacamole Web-Service. You have to initialize a Object with this cmdlet
-    before you can control your server. 
+    The Guacamole-API returns Objects in JSON-Format. This Cmdlet add the JSON-Data as Object-Properties.
+    The Cmdlet is only a helper-Function and cannot be called directly.  
 .EXAMPLE
-    PS C:\> Connect-Guacamole -HostUrl https://myGuacamole.io -Credential Guacadmin
-    Connects to your Server and stores an Authentication-Token for further use
+    PS C:\> Get-GuacamoleAttributes -object $user -SkipEmptyAttributes
+    Adds only Properties with Values
 .NOTES
     Author: Holger Voges
-    Version: 1.0 
-    Date: 2021-11-13
+    Version: 1.1 
+    Date: 2022-02-15
 #>
-Param( $Object )
+Param(  
+        # The Object for which Attributes shall be added   
+        $Object,
+        
+        # Empty Attributes will not be added to the Returned Object
+        [Switch]$SkipEmptyAttributes
+    )
 
     if ( $Object.LastActive ) {
         $Object.LastActive = ConvertFrom-JavaSimpleTime -JavaTime $Object.LastActive
     }
-    Foreach ( $Property in  $Object.attributes.psobject.properties ) {
-        Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name $Property.Name -Value $Property.Value
-    } 
+
+    if ( $SkipEmptyAttributes ) {
+        Foreach ( $Property in  $Object.attributes.psobject.properties ) {
+            If ( $Object.attributes.($Property.Name)) {
+                Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name $Property.Name -Value $Property.Value
+            }
+        }
+    }
+    Else {
+        Foreach ( $Property in  $Object.attributes.psobject.properties ) {
+            Add-Member -Inputobject $Object -MemberType $Property.MemberType.tostring() -Name $Property.Name -Value $Property.Value
+        }
+    }
     $Object
 }

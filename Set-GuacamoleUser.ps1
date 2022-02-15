@@ -1,4 +1,4 @@
-Function Set-GuacamoleUser {
+Function Set-GuacamoleUser2 {
 <#
 .SYNOPSIS
     Changes Guacamole User Settings
@@ -12,78 +12,132 @@ Function Set-GuacamoleUser {
     Version: 1.0 
     Date: 2021-11-14
 #>  
-    param(
-        [Parameter(Mandatory,
-        ValueFromPipelineByPropertyName)]      
-        [string]$Username,
+  param(
+      [Parameter(Mandatory,
+      ValueFromPipelineByPropertyName)]      
+      [string]$Username,
 
-        [Parameter(Mandatory,
-                   ValueFromPipelineByPropertyName)]
-        [string]$Password,
-        
-        [Parameter(ValueFromPipelineByPropertyName)]
-        [string]$EmailAddress,
+      [Parameter(ValueFromPipelineByPropertyName)]
+      [Alias('guac-email-address')]
+      [string]$EmailAddress,
 
-        [Parameter(ValueFromPipelineByPropertyName)]
-        [bool]$Disabled,
+      [Parameter(ValueFromPipelineByPropertyName)]
+      $Disabled,
 
-        [Parameter(ValueFromPipelineByPropertyName)]
-        [bool]$Expired,
+      [Parameter(ValueFromPipelineByPropertyName)]
+      $Expired,
 
-        # Hour and Minute of day
-        [Parameter(ValueFromPipelineByPropertyName)]
-        [DateTime]$StartTime,
+      # Hour and Minute of day
+      [Parameter(ValueFromPipelineByPropertyName)]
+      [Alias('access-window-start')]
+      $StartTime,
 
-        # Hour and Minute of day
-        [Parameter(ValueFromPipelineByPropertyName)]
-        [DateTime]$EndTime,
+      # Hour and Minute of day
+      [Parameter(ValueFromPipelineByPropertyName)]
+      [Alias('access-window-end')]
+      $EndTime,
 
-        # Startdate
-        [Parameter(ValueFromPipelineByPropertyName)]        
-        [Datetime]$ValidFrom,
+      # Startdate
+      [Parameter(ValueFromPipelineByPropertyName)]
+      [Alias('valid-from')]        
+      $ValidFrom,
 
-        # EndDate
-        [Parameter(ValueFromPipelineByPropertyName)]        
-        [Datetime]$ValidUntil,
+      # EndDate
+      [Parameter(ValueFromPipelineByPropertyName)]        
+      [Alias('valid-until')]
+      $ValidUntil,
 
-        [Parameter(ValueFromPipelineByPropertyName)]
-        [String]$TimeZone,
+      [Parameter(ValueFromPipelineByPropertyName)]
+      [String]$TimeZone = 'Europe/Berlin',
 
-        [Parameter(ValueFromPipelineByPropertyName)]
-        [String]$Fullname,
-        
-        [Parameter(ValueFromPipelineByPropertyName)]
-        [string]$Organization,
+      [Parameter(ValueFromPipelineByPropertyName)]
+      [Alias('guac-full-name')]
+      [String]$Fullname,
+      
+      [Parameter(ValueFromPipelineByPropertyName)]
+      [Alias('guac-organization')]
+      [string]$Organization,
 
-        [Parameter(ValueFromPipelineByPropertyName)]
-        [string]$OrganizationRole,
+      [Parameter(ValueFromPipelineByPropertyName)]
+      [Alias('guac-organizational-role')]
+      [string]$OrganizationRole,
 
-        $AuthToken = $Global:GuacAuthToken
-    )
+      [switch]$Passthru,
+
+      $AuthToken = $Global:GuacAuthToken
+  )
 
   Process {
-      $Userproperties = @"
-{
-  "username": "$UserName",
-  "attributes": {
-    "disabled": "$Disabled",
-    "expired": "$Expired",
-    "access-window-start": "$LongonStartTime",
-    "access-window-end": "$LogonEndTime",
-    "valid-from": "$ValidFrom",
-    "valid-until": "$ValidUntil",
-    "timezone": "$timeZone",
-    "guac-email-address": "$EmailAddress"
-    "guac-full-name": "$Fullname",
-    "guac-organization": "$Organization",
-    "guac-organizational-role": "$OrganizationRole"
-  }
-}
-"@
 
-      $EndPoint = '{0}/api/session/data/{1}/users?token={2}' -f $AuthToken.HostUrl,$AuthToken.Datasource,$AuthToken.AuthToken
+    Try {
+        $User = Get-GuacamoleUser -Username $Username
+    }
+    Catch {
+        Throw "User cannot be found"
+    }
 
-      Write-Verbose $Endpoint
-      Invoke-WebRequest -Uri $EndPoint -Method Put -ContentType 'application/json' -Body $UserProperties
+    $User = [ordered]@{
+      username = $Username
+      attributes = [ordered]@{
+      }
+    }
+
+    $ParamList = @{}
+    foreach ( $key in ($PSBoundParameters.Keys).GetEnumerator() )
+    {
+        if ( $PSBoundParameters[$key] )
+        {
+            if ( $key -in 'Starttime','EndTime','ValidFrom','ValidUntil') {
+                $ParamList.Add($key,[datetime]$PSBoundParameters[$key])
+            }
+            Else {
+                $ParamList.Add($key,$PSBoundParameters[$key])
+            }
+        }
+    }
+
+    Switch ($ParamList.Keys) {
+      "EmailAddress"       { $User.attributes."guac-email-address"       = $PSBoundParameters["EmailAddress"] }
+      "Disabled"           { $User.attributes."disabled"                 = $PSBoundParameters["Disabled"] }
+      "Expired"            { $User.attributes."expired"                  = $PSBoundParameters["Expired"] }
+      "StartTime"          { $User.attributes."access-window-start"      = ($PSBoundParameters["Starttime"]).ToString("T") }
+      "EndTime"            { $User.attributes."access-window-end"        = ($PSBoundParameters["EndTime"]).ToString("T") }
+      "ValidFrom"          { $User.attributes."valid-from"               = "{0:yyyy-MM-dd}" -f $PSBoundParameters["ValidFrom"] }
+      "ValidUntil"         { $User.attributes."valid-until"              = "{0:yyyy-MM-dd}" -f $PSBoundParameters["ValidUntil"] }
+      "TimeZone"           { $User.attributes."timezone"                 = $PSBoundParameters["TimeZone"] }
+      "Fullname"           { $User.attributes."guac-full-name"           = $PSBoundParameters["Fullname"] }
+      "Organization"       { $User.attributes."guac-organization"        = $PSBoundParameters["Organization"] }
+      "OrganizationalRole" { $User.attributes."guac-organizational-role" = $PSBoundParameters["OrganizationalRole"] }
+    }    
+<#
+      Switch ($ParamList.Keys) {
+      "EmailAddress"       { $User.attributes["guac-email-address"]       = $PSBoundParameters["EmailAddress"] }
+      "Disabled"           { $User.attributes["disabled"]                 = $PSBoundParameters["Disabled"] }
+      "Expired"            { $User.attributes["expired"]                  = $PSBoundParameters["Expired"] }
+      "StartTime"          { $User.attributes["access-window-start"]      = ($PSBoundParameters["Starttime"]).ToString("T") }
+      "EndTime"            { $User.attributes["access-window-end"]        = ($PSBoundParameters["EndTime"]).ToString("T") }
+      "ValidFrom"          { $User.attributes["valid-from"]               = "{0:yyyy-MM-dd}" -f $PSBoundParameters["ValidFrom"] }
+      "ValidUntil"         { $User.attributes["valid-until"]              = "{0:yyyy-MM-dd}" -f $PSBoundParameters["ValidUntil"] }
+      "TimeZone"           { $User.attributes["timezone"]                 = $PSBoundParameters["TimeZone"] }
+      "Fullname"           { $User.attributes["guac-full-name"]           = $PSBoundParameters["Fullname"] }
+      "Organization"       { $User.attributes["guac-organization"]        = $PSBoundParameters["Organization"] }
+      "OrganizationalRole" { $User.attributes["guac-organizational-role"] = $PSBoundParameters["OrganizationalRole"] }
+    }    
+#>
+
+    $Attributes = $User.Attributes | ConvertTo-Json
+    $RequestBody = @{ 
+        username = $Username
+        attributes = $Attributes
+    }
+
+    $EndPoint = '{0}/api/session/data/{1}/users/{2}?token={3}' -f $AuthToken.HostUrl,$AuthToken.Datasource,$User.Username,$AuthToken.AuthToken
+
+    Write-Verbose $Endpoint
+    $RequestBody
+    $Response = Invoke-RestMethod -Uri $EndPoint -Method Put -ContentType 'application/json' -Body $RequestBody 4>&1
+    If ( $Passthru ) {
+      $Response
+    }
   }
 }
