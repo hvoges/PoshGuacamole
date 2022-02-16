@@ -19,7 +19,7 @@ Function Get-GuacamoleConnectionParameter {
         [Alias('identifier')]
         [string]$ConnectionID,
 
-        $AuthToken = $Global:GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )
 
     process {

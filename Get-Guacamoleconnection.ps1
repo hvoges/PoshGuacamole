@@ -17,7 +17,7 @@ Function Get-GuacamoleConnection {
                    ValueFromPipelineByPropertyName)]
         [string]$ConnectionID,
         
-        $AuthToken = $Global:GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )
 
     Process {    

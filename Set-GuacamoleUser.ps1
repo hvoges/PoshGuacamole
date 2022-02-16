@@ -1,4 +1,4 @@
-Function Set-GuacamoleUser2 {
+Function Set-GuacamoleUser {
 <#
 .SYNOPSIS
     Changes Guacamole User Settings
@@ -30,25 +30,26 @@ Function Set-GuacamoleUser2 {
       # Hour and Minute of day
       [Parameter(ValueFromPipelineByPropertyName)]
       [Alias('access-window-start')]
-      $StartTime,
+      [datetime]$StartTime,
 
       # Hour and Minute of day
       [Parameter(ValueFromPipelineByPropertyName)]
       [Alias('access-window-end')]
-      $EndTime,
+      [DateTime]$EndTime,
 
       # Startdate
       [Parameter(ValueFromPipelineByPropertyName)]
       [Alias('valid-from')]        
-      $ValidFrom,
+      [DateTime]$ValidFrom,
 
       # EndDate
       [Parameter(ValueFromPipelineByPropertyName)]        
       [Alias('valid-until')]
-      $ValidUntil,
+      [DateTime]$ValidUntil,
 
       [Parameter(ValueFromPipelineByPropertyName)]
-      [String]$TimeZone = 'Europe/Berlin',
+      # [ValidateSet($GuacamoleTimeZones)]
+      [GuacamoleTimeZones]$TimeZone = 'Europe_Berlin',
 
       [Parameter(ValueFromPipelineByPropertyName)]
       [Alias('guac-full-name')]
@@ -64,72 +65,48 @@ Function Set-GuacamoleUser2 {
 
       [switch]$Passthru,
 
-      $AuthToken = $Global:GuacAuthToken
+      $AuthToken = $GuacAuthToken
   )
 
   Process {
 
     Try {
-        $User = Get-GuacamoleUser -Username $Username
+        $User = Get-GuacamoleUser -Username $Username -SkipEmptyAttributes
     }
     Catch {
-        Throw "User cannot be found"
-    }
-
-    $User = [ordered]@{
-      username = $Username
-      attributes = [ordered]@{
-      }
+        Throw $_
     }
 
     $ParamList = @{}
     foreach ( $key in ($PSBoundParameters.Keys).GetEnumerator() )
     {
-        if ( $PSBoundParameters[$key] )
-        {
-            if ( $key -in 'Starttime','EndTime','ValidFrom','ValidUntil') {
-                $ParamList.Add($key,[datetime]$PSBoundParameters[$key])
-            }
-            Else {
-                $ParamList.Add($key,$PSBoundParameters[$key])
-            }
+        if ( $key -in 'Starttime','EndTime','ValidFrom','ValidUntil') {
+            $ParamList.Add($key,[datetime]$PSBoundParameters[$key])
+        }
+        Else {
+            $ParamList.Add($key,$PSBoundParameters[$key])
         }
     }
 
     Switch ($ParamList.Keys) {
-      "EmailAddress"       { $User.attributes."guac-email-address"       = $PSBoundParameters["EmailAddress"] }
-      "Disabled"           { $User.attributes."disabled"                 = $PSBoundParameters["Disabled"] }
-      "Expired"            { $User.attributes."expired"                  = $PSBoundParameters["Expired"] }
-      "StartTime"          { $User.attributes."access-window-start"      = ($PSBoundParameters["Starttime"]).ToString("T") }
-      "EndTime"            { $User.attributes."access-window-end"        = ($PSBoundParameters["EndTime"]).ToString("T") }
-      "ValidFrom"          { $User.attributes."valid-from"               = "{0:yyyy-MM-dd}" -f $PSBoundParameters["ValidFrom"] }
-      "ValidUntil"         { $User.attributes."valid-until"              = "{0:yyyy-MM-dd}" -f $PSBoundParameters["ValidUntil"] }
-      "TimeZone"           { $User.attributes."timezone"                 = $PSBoundParameters["TimeZone"] }
-      "Fullname"           { $User.attributes."guac-full-name"           = $PSBoundParameters["Fullname"] }
-      "Organization"       { $User.attributes."guac-organization"        = $PSBoundParameters["Organization"] }
-      "OrganizationalRole" { $User.attributes."guac-organizational-role" = $PSBoundParameters["OrganizationalRole"] }
+      "EmailAddress"       { $User.attributes."guac-email-address"       = $EmailAddress }
+      "Disabled"           { $User.attributes."disabled"                 = $Disabled }
+      "Expired"            { $User.attributes."expired"                  = $Expired }
+      "StartTime"          { $User.attributes."access-window-start"      = $Starttime.ToString("T") }
+      "EndTime"            { $User.attributes."access-window-end"        = $EndTime.ToString("T") }
+      "ValidFrom"          { $User.attributes."valid-from"               = "{0:yyyy-MM-dd}" -f $ValidFrom }
+      "ValidUntil"         { $User.attributes."valid-until"              = "{0:yyyy-MM-dd}" -f $ValidUntil }
+      "TimeZone"           { $User.attributes."timezone"                 = ([String]$TimeZone).replace("_","/") }
+      "Fullname"           { $User.attributes."guac-full-name"           = $Fullname }
+      "Organization"       { $User.attributes."guac-organization"        = $Organization }
+      "OrganizationalRole" { $User.attributes."guac-organizational-role" = $OrganizationalRole }
     }    
-<#
-      Switch ($ParamList.Keys) {
-      "EmailAddress"       { $User.attributes["guac-email-address"]       = $PSBoundParameters["EmailAddress"] }
-      "Disabled"           { $User.attributes["disabled"]                 = $PSBoundParameters["Disabled"] }
-      "Expired"            { $User.attributes["expired"]                  = $PSBoundParameters["Expired"] }
-      "StartTime"          { $User.attributes["access-window-start"]      = ($PSBoundParameters["Starttime"]).ToString("T") }
-      "EndTime"            { $User.attributes["access-window-end"]        = ($PSBoundParameters["EndTime"]).ToString("T") }
-      "ValidFrom"          { $User.attributes["valid-from"]               = "{0:yyyy-MM-dd}" -f $PSBoundParameters["ValidFrom"] }
-      "ValidUntil"         { $User.attributes["valid-until"]              = "{0:yyyy-MM-dd}" -f $PSBoundParameters["ValidUntil"] }
-      "TimeZone"           { $User.attributes["timezone"]                 = $PSBoundParameters["TimeZone"] }
-      "Fullname"           { $User.attributes["guac-full-name"]           = $PSBoundParameters["Fullname"] }
-      "Organization"       { $User.attributes["guac-organization"]        = $PSBoundParameters["Organization"] }
-      "OrganizationalRole" { $User.attributes["guac-organizational-role"] = $PSBoundParameters["OrganizationalRole"] }
-    }    
-#>
 
-    $Attributes = $User.Attributes | ConvertTo-Json
-    $RequestBody = @{ 
+    $Attributes = $User.Attributes 
+    $RequestBody = [ordered]@{ 
         username = $Username
         attributes = $Attributes
-    }
+    } | ConvertTo-Json
 
     $EndPoint = '{0}/api/session/data/{1}/users/{2}?token={3}' -f $AuthToken.HostUrl,$AuthToken.Datasource,$User.Username,$AuthToken.AuthToken
 

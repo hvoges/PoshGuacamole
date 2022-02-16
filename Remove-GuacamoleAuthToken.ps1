@@ -13,7 +13,7 @@ Function Remove-GuacamoleAuthToken {
     Date: 2021-11-13
 #>    
     param(
-        $AuthToken = $Global:GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )   
 
     $EndPoint = '{0}/api/tokens/{1}' -f $AuthToken.HostUrl,$AuthToken.authToken

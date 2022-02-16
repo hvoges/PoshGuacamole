@@ -21,6 +21,9 @@ Param(
         [Switch]$SkipEmptyAttributes
     )
 
+    # Properties which are defaultet to null instead of an empty string
+    $NullProperties = "guac-email-address","guac-organizational-role","guac-full-name","guac-organization","timezone"
+
     if ( $Object.LastActive ) {
         $Object.LastActive = ConvertFrom-JavaSimpleTime -JavaTime $Object.LastActive
     }
@@ -34,8 +37,13 @@ Param(
     }
     Else {
         Foreach ( $Property in  $Object.attributes.psobject.properties ) {
+            If (( -not $Object.attributes.($Property.Name))  -and ( $Property.Name -notin $NullProperties ))
+            {
+                $Object.attributes.($Property.Name) = ""
+            }
             Add-Member -Inputobject $Object -MemberType $Property.MemberType.tostring() -Name $Property.Name -Value $Property.Value
         }
     }
+
     $Object
 }

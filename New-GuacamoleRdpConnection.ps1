@@ -76,7 +76,7 @@ Function New-GuacamoleRdpConnection {
         [ValidateScript({ If ( $_ -gt $MaximumConnections ){ Throw "The number of connections per user cannot be greater then the number of maximum Connections"; $true }  })]
         [Int]$MaximumConnectionsPerUser = 1,
 
-        $AuthToken = $Global:GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )
 
     Process {

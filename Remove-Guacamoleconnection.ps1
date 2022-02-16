@@ -14,7 +14,7 @@ Function Remove-GuacamoleConnection {
 #>    
     param(
         [Parameter(Mandatory)]
-        $AuthToken = $Global:GuacAuthToken,
+        $AuthToken = $GuacAuthToken,
 
         [string]$ConnectionID
     )

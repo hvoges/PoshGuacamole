@@ -60,7 +60,7 @@ Function New-GuacamoleUser {
         [Parameter(ValueFromPipelineByPropertyName)]
         [string]$OrganizationRole,
 
-        $AuthToken = $Global:GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )
 
   Process {

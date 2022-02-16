@@ -35,6 +35,6 @@ param(
         $AuthToken
     }
     Else {
-        $global:GuacAuthToken = $AuthToken
+        $script:GuacAuthToken = $AuthToken
     }
 }

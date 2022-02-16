@@ -17,7 +17,7 @@ Function Add-GuacamoleUserConnection {
 
         [string]$ConnectionID,
 
-        $AuthToken = $global:GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )
 
     $EndPoint = '{0}/api/session/data/{1}/users/{3}/permissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$Username

@@ -18,7 +18,7 @@ Function Get-GuacamoleUserToGroup {
                    ValueFromPipelineByPropertyName)]
         [string]$Username,
 
-        $AuthToken = $Global:GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )
 
     Process {    

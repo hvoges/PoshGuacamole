@@ -13,8 +13,7 @@ Function Get-GuacamoleUser {
     Date: 2022-01-15
 #>    
     param(
-        [Parameter(Mandatory,
-                   ValueFromPipeline,
+        [Parameter(ValueFromPipeline,
                    ValueFromPipelineByPropertyName)]
         [string]$Username,
 
@@ -22,7 +21,7 @@ Function Get-GuacamoleUser {
 
         [Switch]$Raw,
 
-        $AuthToken =$Global:GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )
 
     Process {
@@ -33,17 +32,19 @@ Function Get-GuacamoleUser {
             $EndPoint = '{0}/api/session/data/{1}/users?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken
         }
 
-        if ( $SkipEmptyAttributes ) {
-            $PSDefaultParameterValues=@{"Get-GuacamoleAttributes:SkipEmptyAttributes"=$True} 
-        }
-
         Write-Verbose $Endpoint
-        $userlist = Invoke-RestMethod -Uri $EndPoint
+        Try {
+            $WebResponse = Invoke-WebRequest -Uri $EndPoint -ErrorAction Stop
+        }
+        Catch {
+            Throw $_.Exception.Message
+        }
+        $UserList = $WebResponse | ConvertFrom-Json 
         if ( $PSBoundParameters.ContainsKey('Raw') ) { 
-            $userlist
+            $WebResponse.Content
          }
-        elseif ( $userlist.username ) {
-            Get-GuacamoleAttributes -Object $userlist -SkipEmptyAttributes:$SkipEmptyAttributes
+        elseif ( $UserList.username ) {
+            Get-GuacamoleAttributes -Object $UserList -SkipEmptyAttributes:$SkipEmptyAttributes
         }
         Else {
             Foreach ( $Property in $UserList.psobject.properties ) {

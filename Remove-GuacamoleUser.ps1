@@ -17,7 +17,7 @@ Function Remove-GuacamoleUser {
                    ValueFromPipelineByPropertyName)]   
         [string]$UserName,
         
-        $AuthToken = $Global:GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )
 
     Process {

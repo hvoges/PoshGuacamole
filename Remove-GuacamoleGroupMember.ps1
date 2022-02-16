@@ -14,7 +14,7 @@ Function Remove-GuacamoleGroupMember {
 #>  
     param(
         [Parameter(Mandatory)]
-        $AuthToken = $Global:GuacAuthToken,
+        $AuthToken = $GuacAuthToken,
 
         [string]$Groupname,
 
