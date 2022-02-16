@@ -39,7 +39,12 @@ Function Disconnect-Guacamole {
 "@
 
     Write-Verbose $Endpoint
-    $Response = Invoke-WebRequest -Uri $EndPoint -Method Patch -Body $Command | ConvertFrom-Json
+    Try {
+      $Response = Invoke-RestMethod -Uri $EndPoint -Method Patch -Body $Command -UseBasicParsing
+    }
+    Catch {
+      Throw $_
+    }
     If ($Passthru)
     {
       $Response

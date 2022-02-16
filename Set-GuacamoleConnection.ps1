@@ -117,6 +117,11 @@ Function Set-GuacamoleConnection {
 "@
 
         Write-Verbose $Endpoint
-        $Connections = Invoke-WebRequest -Uri $EndPoint -Method Put -ContentType 'application/json' -Body $ConnectionAttributes
+        Try {
+            $Connections = Invoke-RestMethod -UseBasicParsing -Uri $EndPoint -Method Put -ContentType 'application/json' -Body $ConnectionAttributes
+        }
+        Catch {
+            Throw $_
+        }
     }
 }

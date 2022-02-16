@@ -37,6 +37,11 @@ Function Add-GuacamoleGroupMember {
   
     $EndPoint = '{0}/api/session/data/{1}/users/{3}/userGroups?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$Authtoken.Username
     Write-Verbose -Message $EndPoint
-    $Response = Invoke-WebRequest -Uri $EndPoint -Method Patch -ContentType 'application/json' -Body $Command
+    Try {
+      $Response = Invoke-RestMethod -Uri $EndPoint -Method Patch -ContentType 'application/json' -Body $Command -UseBasicParsing
+    }
+    Catch {
+      Throw $_
+    }
   }
 }

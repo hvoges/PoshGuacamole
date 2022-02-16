@@ -29,22 +29,22 @@ Function Set-GuacamoleUser {
 
       # Hour and Minute of day
       [Parameter(ValueFromPipelineByPropertyName)]
-      [Alias('access-window-start')]
-      [datetime]$StartTime,
+      # [Alias('access-window-start')]
+      [datetime]$AccessWindowStart,
 
       # Hour and Minute of day
       [Parameter(ValueFromPipelineByPropertyName)]
-      [Alias('access-window-end')]
-      [DateTime]$EndTime,
+      # [Alias('access-window-end')]
+      [DateTime]$AccessWindowEnd,
 
       # Startdate
       [Parameter(ValueFromPipelineByPropertyName)]
-      [Alias('valid-from')]        
+      # [Alias('valid-from')]        
       [DateTime]$ValidFrom,
 
       # EndDate
       [Parameter(ValueFromPipelineByPropertyName)]        
-      [Alias('valid-until')]
+      # [Alias('valid-until')]
       [DateTime]$ValidUntil,
 
       [Parameter(ValueFromPipelineByPropertyName)]
@@ -71,7 +71,7 @@ Function Set-GuacamoleUser {
   Process {
 
     Try {
-        $User = Get-GuacamoleUser -Username $Username -SkipEmptyAttributes
+        $User = Get-GuacamoleUser -Username $Username
     }
     Catch {
         Throw $_
@@ -80,20 +80,23 @@ Function Set-GuacamoleUser {
     $ParamList = @{}
     foreach ( $key in ($PSBoundParameters.Keys).GetEnumerator() )
     {
-        if ( $key -in 'Starttime','EndTime','ValidFrom','ValidUntil') {
+        $ParamList.Add($key,$PSBoundParameters[$key])
+<#        
+        if ( $key -in 'AccessWindowStart','AccessWindowEnd','ValidFrom','ValidUntil') {
             $ParamList.Add($key,[datetime]$PSBoundParameters[$key])
         }
         Else {
             $ParamList.Add($key,$PSBoundParameters[$key])
         }
+#>
     }
 
     Switch ($ParamList.Keys) {
       "EmailAddress"       { $User.attributes."guac-email-address"       = $EmailAddress }
       "Disabled"           { $User.attributes."disabled"                 = $Disabled }
       "Expired"            { $User.attributes."expired"                  = $Expired }
-      "StartTime"          { $User.attributes."access-window-start"      = $Starttime.ToString("T") }
-      "EndTime"            { $User.attributes."access-window-end"        = $EndTime.ToString("T") }
+      "AccessWindowStart"  { $User.attributes."access-window-start"      = $AccessWindowStart.ToString("T") }
+      "AccessWindowEnd"    { $User.attributes."access-window-end"        = $AccessWindowEnd.ToString("T") }
       "ValidFrom"          { $User.attributes."valid-from"               = "{0:yyyy-MM-dd}" -f $ValidFrom }
       "ValidUntil"         { $User.attributes."valid-until"              = "{0:yyyy-MM-dd}" -f $ValidUntil }
       "TimeZone"           { $User.attributes."timezone"                 = ([String]$TimeZone).replace("_","/") }
@@ -111,8 +114,12 @@ Function Set-GuacamoleUser {
     $EndPoint = '{0}/api/session/data/{1}/users/{2}?token={3}' -f $AuthToken.HostUrl,$AuthToken.Datasource,$User.Username,$AuthToken.AuthToken
 
     Write-Verbose $Endpoint
-    $RequestBody
-    $Response = Invoke-RestMethod -Uri $EndPoint -Method Put -ContentType 'application/json' -Body $RequestBody 4>&1
+    Try {
+        $Response = Invoke-RestMethod -Uri $EndPoint -Method Put -ContentType 'application/json' -Body $RequestBody -UseBasicParsing -ErrorAction Stop
+    }
+    Catch {
+        Throw $_ 
+    }
     If ( $Passthru ) {
       $Response
     }

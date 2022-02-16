@@ -1,37 +1,49 @@
 Function Add-GuacamoleUserConnection {
 <#
 .SYNOPSIS
-    Returns an individual or all Guacamole-Connections
+    Adds a connection to a user. 
 .DESCRIPTION
-    Returns an individual or all Guacamole-Connections
+    Adds a connection to user. Can be called via pipeline. 
 .EXAMPLE
-    PS C:\> Get-GuacamoleConnection -ConnectionID PC12
-    Returns the Connection-Settings for the Connection PC12
+    PS C:\> Add-GuacamoleUserConnection -Username DemoUser -ConnectionID 43
+    Adds the Connection with ID 43 to Demouser
 .NOTES
     Author: Holger Voges
     Version: 1.0 
-    Date: 2021-11-13
+    Date: 2022-02-16
 #>  
     param(
+        [Parameter(Mandatory,
+                   ValueFromPipeline,
+                   ValueFromPipelineByPropertyName)]
         [string]$Username,
 
+        [Parameter(Mandatory,
+                   ValueFromPipelineByPropertyName)]
         [string]$ConnectionID,
 
         $AuthToken = $GuacAuthToken
     )
 
-    $EndPoint = '{0}/api/session/data/{1}/users/{3}/permissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$Username
+    Process {
+        $EndPoint = '{0}/api/session/data/{1}/users/{3}/permissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$Username
 
-    $Command = @"
-[
-  {
-    "op": "add",
-    "path": "/connectionPermissions/$ConnectionId",
-    "value": "READ"
-  }
-]
+        $Command = @"
+    [
+    {
+        "op": "add",
+        "path": "/connectionPermissions/$ConnectionId",
+        "value": "READ"
+    }
+    ]
 "@
 
-    Write-Verbose $Endpoint
-    $Response = Invoke-WebRequest -Uri $EndPoint -Method Patch -Body $Command | ConvertFrom-Json
+        Write-Verbose $Endpoint
+        Try {
+            $Response = Invoke-RestMethod -Uri $EndPoint -Method Patch -Body $Command -UseBasicParsing -ErrorAction Stop
+        }
+        Catch {
+            Throw $_
+        }
+    }
 }

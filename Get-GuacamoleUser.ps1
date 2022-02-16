@@ -17,7 +17,7 @@ Function Get-GuacamoleUser {
                    ValueFromPipelineByPropertyName)]
         [string]$Username,
 
-        [Switch]$SkipEmptyAttributes,
+        [Switch]$ListEmptyAttributes,
 
         [Switch]$Raw,
 
@@ -34,7 +34,7 @@ Function Get-GuacamoleUser {
 
         Write-Verbose $Endpoint
         Try {
-            $WebResponse = Invoke-WebRequest -Uri $EndPoint -ErrorAction Stop
+            $WebResponse = Invoke-WebRequest -UseBasicParsing -Uri $EndPoint -ErrorAction Stop
         }
         Catch {
             Throw $_.Exception.Message
@@ -47,8 +47,8 @@ Function Get-GuacamoleUser {
             Get-GuacamoleAttributes -Object $UserList -SkipEmptyAttributes:$SkipEmptyAttributes
         }
         Else {
-            Foreach ( $Property in $UserList.psobject.properties ) {
-                Get-GuacamoleAttributes -Object ( $UserList.($Property.Name) )  -SkipEmptyAttributes:$SkipEmptyAttributes
+            Foreach ( $Property in $UserList.psobject.properties.Name ) {
+                Get-GuacamoleAttributes -Object $UserList.$Property -SkipEmptyAttributes:$SkipEmptyAttributes
             } 
         }
     }

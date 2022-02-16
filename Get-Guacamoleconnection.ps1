@@ -16,6 +16,8 @@ Function Get-GuacamoleConnection {
         [Parameter(ValueFromPipeline,
                    ValueFromPipelineByPropertyName)]
         [string]$ConnectionID,
+
+        [Switch]$IncludeConnectionParameter,
         
         $AuthToken = $GuacAuthToken
     )
@@ -29,14 +31,33 @@ Function Get-GuacamoleConnection {
         }
 
         Write-Verbose $Endpoint
-        $ConnectionList = Invoke-WebRequest -Uri $EndPoint | ConvertFrom-Json
-        If ( $ConnectionList.Name ) {
-            Get-GuacamoleAttributes -Object $connectionList
+        Try {
+            $WebResponse = Invoke-RestMethod -UseBasicParsing -Uri $EndPoint
+        }
+        Catch {
+            Throw $_
+        }
+        If ( $WebResponse.Name ) {
+            $ConnectionList = @( Get-GuacamoleAttributes -Object $WebResponse )
         }
         Else {
-            Foreach ( $Property in $ConnectionList.psobject.properties ) {
-                Get-GuacamoleAttributes -Object ( $ConnectionList.( $Property.name ))
+            $ConnectionList = Foreach ( $Property in $WebResponse.psobject.properties.Name ) {
+                @( Get-GuacamoleAttributes -Object ( $WebResponse.( $Property )))
             }
+        }
+        If ( $IncludeConnectionParameter ) {
+            Foreach ( $Connection in $ConnectionList )
+            {
+                $ConnectionParameter = Get-GuacamoleConnectionParameter -ConnectionID $Connection.identifier 
+                Foreach ( $Parameter in $ConnectionParameter.psobject.Properties.Name )
+                {
+                    Add-Member -InputObject $Connection -MemberType NoteProperty -Name $Parameter -Value ($ConnectionParameter.$parameter)
+                }
+                $Connection
+            }
+        }
+        Else {
+            $ConnectionList
         }
     }
 }

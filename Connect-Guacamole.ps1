@@ -17,6 +17,11 @@ Function  Connect-Guacamole
 param(
     # The URL to your Server    
     [Parameter(mandatory)]
+    [ValidateScript({ 
+        if ( $_ -notmatch '^(https?:\/\/)?([\da-z\.-]+\.[a-z\.]{2,6}|[\d\.]+)([\/:?=&#]{1}[\da-z\.-]+)*[\/\?]?$' ) {  
+            Throw "Invalid URL"}
+        $true }
+    )]
     [String]$HostUrl,
 
     # The Credential to a User with administrative Permissions
@@ -26,8 +31,11 @@ param(
     [Switch]$Passthru
 )
 
+    If ($HostUrl -notmatch "^https?:\/\/") { 
+        $HostUrl = "https://{0}" -f $HostUrl  
+    }
     $EndPoint = '{0}/api/tokens' -f $HostUrl
-    $ApiResponse = (Invoke-WebRequest -Uri $EndPoint -Method Post -Body @{"username"=$Credential.username;"password"=$Credential.GetNetworkCredential().password}).Content 
+    $ApiResponse = (Invoke-WebRequest -Uri $EndPoint -UseBasicParsing -Method Post -Body @{"username"=$Credential.username;"password"=$Credential.GetNetworkCredential().password}).Content 
     $AuthToken = $ApiResponse | ConvertFrom-Json 
     $AuthToken | Add-Member -Name HostUrl -Value $HostUrl -MemberType NoteProperty
     $AuthToken | Add-Member -Name JsonToken -Value $ApiResponse -MemberType NoteProperty

@@ -18,7 +18,7 @@ Param(
         $Object,
         
         # Empty Attributes will not be added to the Returned Object
-        [Switch]$SkipEmptyAttributes
+        [Switch]$ShowEmptyAttributes
     )
 
     # Properties which are defaultet to null instead of an empty string
@@ -28,20 +28,33 @@ Param(
         $Object.LastActive = ConvertFrom-JavaSimpleTime -JavaTime $Object.LastActive
     }
 
-    if ( $SkipEmptyAttributes ) {
+    # Show all User-Attributes, even the empty ones
+    if ( $ShowEmptyAttributes ) {
         Foreach ( $Property in  $Object.attributes.psobject.properties ) {
-            If ( $Object.attributes.($Property.Name)) {
-                Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name $Property.Name -Value $Property.Value
+            If (( -not $Object.attributes.($Property.Name))  -and ( $Property.Name -notin $NullProperties )) {
+                $Object.attributes.($Property.Name) = ""
+            }
+            If ( $Property.Name -eq "TimeZone" ) {
+                Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name ( Format-GuacamoleString -String $Property.Name ) -Value $Property.Value.Replace('/','_')
+            } 
+            Else {
+                Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name ( Format-GuacamoleString -String $Property.Name )  -Value $Property.Value
             }
         }
     }
     Else {
         Foreach ( $Property in  $Object.attributes.psobject.properties ) {
-            If (( -not $Object.attributes.($Property.Name))  -and ( $Property.Name -notin $NullProperties ))
-            {
-                $Object.attributes.($Property.Name) = ""
+            If ( $Object.attributes.($Property.Name)) {
+                If ( $Property.Name -eq "TimeZone" ) {
+                    Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name ( Format-GuacamoleString -String $Property.Name ) -Value $Property.Value.Replace('/','_')
+                } 
+                Else {
+                    Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name ( Format-GuacamoleString -String $Property.Name )  -Value $Property.Value
+                }
             }
-            Add-Member -Inputobject $Object -MemberType $Property.MemberType.tostring() -Name $Property.Name -Value $Property.Value
+            If (( -not $Object.attributes.($Property.Name))  -and ( $Property.Name -notin $NullProperties )) {
+                $Object.attributes.($Property.Name) = ""
+            }            
         }
     }
 

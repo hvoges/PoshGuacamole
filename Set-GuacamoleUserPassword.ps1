@@ -39,6 +39,11 @@ Function Set-GuacamoleUserPassword {
 "@
 
         Write-Verbose $Endpoint
-        $Response = Invoke-WebRequest -Uri $EndPoint -Method Put -Body $Command | ConvertFrom-Json    
+        Try {   
+            $Response = Invoke-RestMethod -Uri $EndPoint -Method Put -Body $Command -UseBasicParsing
+        }
+        Catch {
+            Throw $_
+        }
     }
 }

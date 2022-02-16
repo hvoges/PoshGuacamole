@@ -1,11 +1,11 @@
 Function Remove-GuacamoleGroupMember {
 <#
 .SYNOPSIS
-    Returns an individual or all Guacamole-Connections
+    Removes a User from a group
 .DESCRIPTION
-    Returns an individual or all Guacamole-Connections
+    Removes a User from a Group. To Remove serveral Users from a Group, use the Pipeline.
 .EXAMPLE
-    PS C:\> Get-GuacamoleConnection -ConnectionID PC12
+    PS C:\> Remove-GuacamoleGroupMember -GroupName 
     Returns the Connection-Settings for the Connection PC12
 .NOTES
     Author: Holger Voges
@@ -33,5 +33,10 @@ $Command = @"
  
     $EndPoint = '{0}/api/session/data/{1}/users/{3}/userGroups?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$Username
     Write-Verbose -Message $EndPoint
-    $Response = Invoke-WebRequest -Uri $EndPoint -Method Patch -ContentType 'application/json' -Body $Command
+    Try {
+        $Response = Invoke-RestMethod -Uri $EndPoint -Method Patch -ContentType 'application/json' -Body $Command
+    }
+    Catch {
+        Throw $_
+    }
 }

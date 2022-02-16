@@ -18,15 +18,31 @@ Function Get-GuacamoleUserPermission {
                    ValueFromPipelineByPropertyName)]
         [string]$Username,
 
+        [Switch]$EffectivePermissions,
+
         $AuthToken = $GuacAuthToken
     )
 
     Process {
-        $EndPoint = '{0}/api/session/data/{1}/users/{3}/permissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$AuthToken.Username
+        If ( $EffectivePermissions ) {
+            $EndPoint = '{0}/api/session/data/{1}/users/{3}/effectivePermissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$AuthToken.Username    
+        }
+        Else {
+            $EndPoint = '{0}/api/session/data/{1}/users/{3}/permissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$AuthToken.Username
+        }
+
         Write-Verbose $Endpoint
-        $Permissions = Invoke-WebRequest -Uri $EndPoint | ConvertFrom-Json
+        Try {
+            $Permissions = Invoke-RestMethod -Uri $EndPoint -UseBasicParsing -ErrorAction Stop
+        }
+        Catch {
+            Throw $_
+        }
+        $PermissionObject = New-Object -TypeName PSCustomObject
         Foreach ( $Property in $Permissions.psobject.properties ) {
-            Get-GuacamoleAttributes -Object ( $Permissions.($Property.Name) )
+            $PermissionList = Get-GuacamoleAttributes -Object ( $Permissions.($Property.Name) )
+            Add-Member -InputObject $PermissionObject -MemberType NoteProperty -Name $Property.name -Value $PermissionList 
         } 
+        $PermissionObject
     }
 }

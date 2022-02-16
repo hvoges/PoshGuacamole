@@ -24,6 +24,11 @@ Function Remove-GuacamoleUser {
         $EndPoint = '{0}/api/session/data/{1}/users/{3}?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$UserName
 
         Write-Verbose $Endpoint
-        $Connections = Invoke-WebRequest -Uri $EndPoint -Method Delete
+        Try {
+            $Connections = Invoke-RestMethod -Uri $EndPoint -Method Delete -UseBasicParsing -ErrorAction Stop 
+        }
+        Catch {
+            $_
+        }
     }
 }

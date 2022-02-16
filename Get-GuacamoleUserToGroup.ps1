@@ -23,6 +23,11 @@ Function Get-GuacamoleUserToGroup {
 
     Process {    
         $EndPoint = '{0}/api/session/data/{1}/users/{3}/userGroups?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$AuthToken.Username
-        Invoke-WebRequest -Uri $EndPoint | ConvertFrom-Json
+        Try {
+            Invoke-RestMethod -Uri $EndPoint -UseBasicParsing
+        }
+        Catch {
+            Throw $_
+        }
     }
 }
