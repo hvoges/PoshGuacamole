@@ -70,7 +70,7 @@ Function New-GuacamoleUser {
   Process {
     $user = [ordered]@{
       username = $Username
-      Password = $Password
+      password = $Password
       attributes = [ordered]@{
       }
     }
