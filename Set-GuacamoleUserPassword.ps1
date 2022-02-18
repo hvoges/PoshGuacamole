@@ -1,49 +1,57 @@
 Function Set-GuacamoleUserPassword {
 <#
 .SYNOPSIS
-    Returns an individual or all Guacamole-Connections
+    Resets the User-Password
 .DESCRIPTION
-    Returns an individual or all Guacamole-Connections
+    This Command sets a new Password. It can be used via Pipeline to reset multiple-User Passwords 
+    to the same value. 
 .EXAMPLE
-    PS C:\> Get-GuacamoleConnection -ConnectionID PC12
-    Returns the Connection-Settings for the Connection PC12
+    Reset the Password of a single user
+    PS C:\> $Password = Convertto-SecureString -String "Password" -AsPlainText -Force
+    PS C:\> Set-GuacamoleUserPassword -User John -Password $Password
 .NOTES
     Author: Holger Voges
     Version: 1.0 
-    Date: 2021-11-13
+    Date: 2022-18-02
 #>    
     param(
         [Parameter(Mandatory,
                    ValueFromPipeline,
                    ValueFromPipelineByPropertyName)]
         [string]$Username,
-
-        [string]$OldPassword,
         
         [Parameter(Mandatory,
                    ValueFromPipeline,
                    ValueFromPipelineByPropertyName)]
-        [string]$NewPassword,
+        [SecureString]$Password,
 
-        $AuthToke = $GuacAuthToken
+        $AuthToken = $GuacAuthToken
     )
 
-    Process {    
-        $EndPoint = '{0}/api/session/data/{1}/users/{3}/password?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$Username
-
-        $Command = @"
-    {
-        "oldPassword": "$OldPassword",
-        "newPassword": "$NewPassword"
-    }
-"@
-
-        Write-Verbose $Endpoint
-        Try {   
-            $Response = Invoke-RestMethod -Uri $EndPoint -Method Put -Body $Command -UseBasicParsing
+    Process {
+        Try {
+            $User = Get-GuacamoleUser -Username $Username
         }
         Catch {
             Throw $_
         }
+        
+        $Cred = New-Object -TypeName pscredential -ArgumentList $Username,$Password
+
+        $RequestBody = [ordered]@{ 
+            username = $Username
+            password = $Cred.GetNetworkCredential().Password
+            attributes = $User.attributes
+        } | ConvertTo-Json
+    
+        $EndPoint = '{0}/api/session/data/{1}/users/{2}?token={3}' -f $AuthToken.HostUrl,$AuthToken.Datasource,$User.Username,$AuthToken.AuthToken
+    
+        Write-Verbose $Endpoint
+        Try {
+            $Response = Invoke-RestMethod -Uri $EndPoint -Method Put -ContentType 'application/json' -Body $RequestBody -UseBasicParsing -ErrorAction Stop
+        }
+        Catch {
+            Throw $_ 
+        }
+      }
     }
-}
