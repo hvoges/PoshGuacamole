@@ -13,7 +13,8 @@ Function Get-GuacamoleUserHistory {
     Date: 2022-01-15
 #>    
     param(
-        [Parameter(ValueFromPipeline,
+        [Parameter(Mandatory,
+                   ValueFromPipeline,
                    ValueFromPipelineByPropertyName)]
         [string]$Username,
 
