@@ -30,8 +30,11 @@ Function Get-GuacamoleConnectionParameter {
         Try {
             $WebResponse = Invoke-WebRequest -Uri $EndPoint -UseBasicParsing 
             $ConnectionSettings = $WebResponse.Content | ConvertFrom-Json
-            $ConnectionSettings.Password = ConvertTo-SecureString -String $ConnectionSettings.password -AsPlainText -Force
-            $Content = $WebResponse.Content -replace '"password":".*?"','"password":"*"'
+            if ( $ConnectionSettings.Password )
+            {
+                $ConnectionSettings.Password = ConvertTo-SecureString -String $ConnectionSettings.password -AsPlainText -Force
+                $Content = $WebResponse.Content -replace '"password":".*?"','"password":"*"'
+            }
             $ConnectionSettings | Add-Member -MemberType NoteProperty -Name attributes -Value $Content
         }
         Catch {
