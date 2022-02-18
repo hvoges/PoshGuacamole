@@ -5,12 +5,12 @@ Function Remove-GuacamoleUser {
 .DESCRIPTION
     
 .EXAMPLE
-    PS C:\> Get-GuacamoleConnection -ConnectionID PC12
-    Returns the Connection-Settings for the Connection PC12
+    PS C:\> Remove-GuacamoleUser -UserName Amr
+    Removes the User Amr Zaki
 .NOTES
     Author: Holger Voges
     Version: 1.0 
-    Date: 2021-11-14
+    Date: 2022-02-18
 #>    
     param(
         [Parameter(Mandatory,
