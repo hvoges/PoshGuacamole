@@ -17,8 +17,14 @@ Function Get-GuacamoleConnection {
                    ValueFromPipelineByPropertyName)]
         [string]$ConnectionID,
 
+        # List all Attributes as Object Properties, even empty ones. If you use this parameter, you 
+        # may break the Pipeline-Functionality.
+        [Switch]$ShowEmptyAttributes,
+
+        # Adds the Connection-Parameter to the Output
         [Switch]$IncludeConnectionParameter,
         
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 
@@ -38,26 +44,18 @@ Function Get-GuacamoleConnection {
             Throw $_
         }
         If ( $WebResponse.Name ) {
-            $ConnectionList = @( Get-GuacamoleAttributes -Object $WebResponse )
+            $ConnectionList = @( Get-GuacamoleAttributes -Object $WebResponse -ShowEmptyAttributes:$ShowEmptyAttributes )
+            $ConnectionParameter = Get-GuacamoleConnectionParameter -ConnectionID $ConnectionList.identifier 
+            $ConnectionList | Add-Member -MemberType NoteProperty -Name ConnectionParameter -Value $ConnectionParameter
         }
         Else {
             $ConnectionList = Foreach ( $Property in $WebResponse.psobject.properties.Name ) {
-                @( Get-GuacamoleAttributes -Object ( $WebResponse.( $Property )))
-            }
-        }
-        If ( $IncludeConnectionParameter ) {
-            Foreach ( $Connection in $ConnectionList )
-            {
+                $Connection = @( Get-GuacamoleAttributes -Object ( $WebResponse.( $Property )) -ShowEmptyAttributes:$ShowEmptyAttributes )
                 $ConnectionParameter = Get-GuacamoleConnectionParameter -ConnectionID $Connection.identifier 
-                Foreach ( $Parameter in $ConnectionParameter.psobject.Properties.Name )
-                {
-                    Add-Member -InputObject $Connection -MemberType NoteProperty -Name $Parameter -Value ($ConnectionParameter.$parameter)
-                }
+                $Connection | Add-Member -MemberType NoteProperty -Name ConnectionParameter -Value $ConnectionParameter
                 $Connection
             }
         }
-        Else {
-            $ConnectionList
-        }
+        $ConnectionList
     }
 }
