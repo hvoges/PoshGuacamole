@@ -17,7 +17,9 @@ Function Get-GuacamoleUser {
                    ValueFromPipelineByPropertyName)]
         [string]$Username,
 
-        [Switch]$ListEmptyAttributes,
+        # List all Attributes as Object Properties, even empty ones. If you use this parameter, you 
+        # may break the Pipeline-Functionality.
+        [Switch]$ShowEmptyAttributes,
 
         [Switch]$Raw,
 
@@ -44,12 +46,12 @@ Function Get-GuacamoleUser {
             $WebResponse.Content
          }
         elseif ( $UserList.username ) {
-            Get-GuacamoleAttributes -Object $UserList -SkipEmptyAttributes:$SkipEmptyAttributes
+            Get-GuacamoleAttributes -Object $UserList -ShowEmptyAttributes:$ShowEmptyAttributes
         }
         Else {
             Foreach ( $Property in $UserList.psobject.properties.Name ) {
-                Get-GuacamoleAttributes -Object $UserList.$Property -SkipEmptyAttributes:$SkipEmptyAttributes
-            } 
+                Get-GuacamoleAttributes -Object $UserList.$Property -ShowEmptyAttributes:$ShowEmptyAttributes
+            }        
         }
     }
 }
