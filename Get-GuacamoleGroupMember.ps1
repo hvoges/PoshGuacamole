@@ -1,4 +1,4 @@
-Function Get-GuacamoleUserToGroup {
+Function Get-GuacamoleGroupMember {
 <#
 .SYNOPSIS
     Returns The Groups a User is member in
