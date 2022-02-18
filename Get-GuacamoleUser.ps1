@@ -21,6 +21,7 @@ Function Get-GuacamoleUser {
         # may break the Pipeline-Functionality.
         [Switch]$ShowEmptyAttributes,
 
+        # Returns the Raw JSON-String
         [Switch]$Raw,
 
         [Parameter(DontShow)]
@@ -43,7 +44,7 @@ Function Get-GuacamoleUser {
             Throw $_.Exception.Message
         }
         $UserList = $WebResponse | ConvertFrom-Json 
-        if ( $PSBoundParameters.ContainsKey('Raw') ) { 
+        if ( $Raw ) { 
             $WebResponse.Content
          }
         elseif ( $UserList.username ) {

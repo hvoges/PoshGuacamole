@@ -13,7 +13,7 @@ Function Remove-GuacamoleUserGroup {
     #>  
     param(
         [Parameter(Mandatory,
-        ValueFromPipelineByPropertyName)]      
+                   ValueFromPipelineByPropertyName)]      
         [Alias('identifier')]
         [string]$GroupName,
 
@@ -22,15 +22,11 @@ Function Remove-GuacamoleUserGroup {
     )
     
     Process {
-      $EndPoint = '{0}/api/session/data/{1}/userGroups?token={2}' -f $AuthToken.HostUrl,$AuthToken.Datasource,$AuthToken.AuthToken
-
-      If ( $Disabled ) {
-        $GroupPropertiesDict.attributes["disabled"] = "true"
-      }
+      $EndPoint = '{0}/api/session/data/{1}/userGroups/{3}?token={2}' -f $AuthToken.HostUrl,$AuthToken.Datasource,$AuthToken.AuthToken,$GroupName
 
       Write-Verbose $Endpoint
       Try {
-        $Response = Invoke-RestMethod -Uri $EndPoint -Method Delete -ContentType 'application/json' 
+        $Response = Invoke-RestMethod -Uri $EndPoint -Method Delete
       }
       Catch {
 
