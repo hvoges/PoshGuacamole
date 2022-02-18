@@ -19,6 +19,7 @@ Function Get-GuacamoleConnectionParameter {
         [Alias('identifier')]
         [string]$ConnectionID,
 
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 
@@ -26,8 +27,16 @@ Function Get-GuacamoleConnectionParameter {
         $EndPoint = '{0}/api/session/data/{1}/connections/{3}/parameters?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$ConnectionID
 
         Write-Verbose $Endpoint
-        $ConnectionSettings = Invoke-RestMethod -Uri $EndPoint -UseBasicParsing
-        $ConnectionSettings.Password = ConvertTo-SecureString -String $ConnectionSettings.password -AsPlainText -Force
+        Try {
+            $WebResponse = Invoke-WebRequest -Uri $EndPoint -UseBasicParsing 
+            $ConnectionSettings = $WebResponse.Content | ConvertFrom-Json
+            $ConnectionSettings.Password = ConvertTo-SecureString -String $ConnectionSettings.password -AsPlainText -Force
+            $Content = $WebResponse.Content -replace '"password":".*?"','"password":"*"'
+            $ConnectionSettings | Add-Member -MemberType NoteProperty -Name attributes -Value $Content
+        }
+        Catch {
+            Throw $_
+        }
         $ConnectionSettings
     }
 }
