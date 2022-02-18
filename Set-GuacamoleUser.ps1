@@ -63,8 +63,12 @@ Function Set-GuacamoleUser {
       [Alias('guac-organizational-role')]
       [string]$OrganizationRole,
 
+      [Parameter(ValueFromPipelineByPropertyName)]
+      [SecureString]$Password,
+
       [switch]$Passthru,
 
+      [Parameter(DontShow)]
       $AuthToken = $GuacAuthToken
   )
 
@@ -81,14 +85,6 @@ Function Set-GuacamoleUser {
     foreach ( $key in ($PSBoundParameters.Keys).GetEnumerator() )
     {
         $ParamList.Add($key,$PSBoundParameters[$key])
-<#        
-        if ( $key -in 'AccessWindowStart','AccessWindowEnd','ValidFrom','ValidUntil') {
-            $ParamList.Add($key,[datetime]$PSBoundParameters[$key])
-        }
-        Else {
-            $ParamList.Add($key,$PSBoundParameters[$key])
-        }
-#>
     }
 
     Switch ($ParamList.Keys) {
@@ -106,10 +102,17 @@ Function Set-GuacamoleUser {
     }    
 
     $Attributes = $User.Attributes 
-    $RequestBody = [ordered]@{ 
+    $RequestBodyDict = [ordered]@{ 
         username = $Username
         attributes = $Attributes
-    } | ConvertTo-Json
+    } 
+
+    If ( $Password ) {
+        $Cred = New-Object -TypeName pscredential -ArgumentList $Username,$Password
+        $RequestBodyDict["password"] = $Cred.GetNetworkCredential().Password
+    }
+
+    $RequestBody = $RequestBodyDict | ConvertTo-Json
 
     $EndPoint = '{0}/api/session/data/{1}/users/{2}?token={3}' -f $AuthToken.HostUrl,$AuthToken.Datasource,$User.Username,$AuthToken.AuthToken
 
