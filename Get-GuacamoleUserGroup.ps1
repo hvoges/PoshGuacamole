@@ -30,7 +30,8 @@ Function Get-GuacamoleUserGroup {
 
         Write-Verbose $Endpoint
         Try {
-            Invoke-RestMethod -UseBasicParsing -Uri $EndPoint -ErrorAction Stop
+            $WebResponse = Invoke-WebRequest -UseBasicParsing -Uri $EndPoint -ErrorAction Stop
+            $WebResponse | ConvertFrom-Json
         }
         Catch {
             Throw $_.Exception.Message
