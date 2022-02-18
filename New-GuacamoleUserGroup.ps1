@@ -17,8 +17,7 @@ Function New-GuacamoleUserGroup {
         [Alias('identifier')]
         [string]$GroupName,
 
-        [Parameter(Mandatory,
-                   ValueFromPipelineByPropertyName)]
+        [Parameter(ValueFromPipelineByPropertyName)]
         [switch]$Disabled,
    
         [switch]$Passthru,
@@ -30,17 +29,19 @@ Function New-GuacamoleUserGroup {
     Process {
       $EndPoint = '{0}/api/session/data/{1}/userGroups?token={2}' -f $AuthToken.HostUrl,$AuthToken.Datasource,$AuthToken.AuthToken
   
- 
-      If (-not $Disabled ) {
-          $Disabled = ""
-      }
-      $GroupProperties = [ordered]@{
-        identifier = $Username
+      $GroupPropertiesDict = [ordered]@{
+        identifier = $GroupName
         attributes = [ordered]@{
-           disabled = $Disabled
+          "disabled" = ""
         }
       }
-  
+
+      If ( $Disabled ) {
+        $GroupPropertiesDict.attributes["disabled"] = "true"
+      }
+
+
+      $GroupProperties = $GroupPropertiesDict | ConvertTo-Json
       Write-Verbose $Endpoint
       $Response = Invoke-RestMethod -Uri $EndPoint -Method Post -ContentType 'application/json' -Body $GroupProperties
       If ( $Passthru ) {

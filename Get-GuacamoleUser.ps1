@@ -23,6 +23,7 @@ Function Get-GuacamoleUser {
 
         [Switch]$Raw,
 
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 
