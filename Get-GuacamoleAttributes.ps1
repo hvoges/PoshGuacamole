@@ -34,9 +34,13 @@ Param(
             If (( -not $Object.attributes.($Property.Name))  -and ( $Property.Name -notin $NullProperties )) {
                 $Object.attributes.($Property.Name) = ""
             }
-            If ( $Property.Name -eq "TimeZone" ) {
+            If ( $Property.Name -eq "TimeZone" -and $Property.Value ) {
                 Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name ( Format-GuacamoleString -String $Property.Name ) -Value $Property.Value.Replace('/','_')
             } 
+            ElseIf ( $Property.Name -eq "TimeZone" )
+            {
+                Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name ( Format-GuacamoleString -String $Property.Name ) -Value $Null
+            }
             Else {
                 Add-Member -InputObject $Object -MemberType $Property.MemberType.tostring() -Name ( Format-GuacamoleString -String $Property.Name )  -Value $Property.Value
             }
