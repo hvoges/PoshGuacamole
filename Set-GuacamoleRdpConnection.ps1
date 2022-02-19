@@ -1,4 +1,4 @@
-Function Set-GuacamoleConnection {
+Function Set-GuacamoleRdpConnection {
 <#
 .SYNOPSIS
     Returns an individual or all Guacamole-Connections
