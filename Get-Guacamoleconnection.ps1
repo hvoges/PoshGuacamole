@@ -12,11 +12,19 @@ Function Get-GuacamoleConnection {
     Version: 1.0 
     Date: 2021-11-13
 #>
+    [CmdletBinding(DefaultParameterSetName='All')]
     param(
-        [Parameter(ValueFromPipeline,
-                   ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory,
+                   ValueFromPipeline,
+                   ValueFromPipelineByPropertyName,
+                   ParameterSetName='ByID')]
         [string]$ConnectionID,
 
+        [Parameter(ValueFromPipeline,
+                   ValueFromPipelineByPropertyName,
+                   ParameterSetName='ByName')]
+        [string[]]$ConnectionName,
+        
         # List all Attributes as Object Properties, even empty ones. If you use this parameter, you 
         # may break the Pipeline-Functionality.
         [Switch]$ShowEmptyAttributes,
@@ -43,19 +51,29 @@ Function Get-GuacamoleConnection {
         Catch {
             Throw $_
         }
+
         If ( $WebResponse.Name ) {
             $ConnectionList = @( Get-GuacamoleAttributes -Object $WebResponse -ShowEmptyAttributes:$ShowEmptyAttributes )
-            $ConnectionParameter = Get-GuacamoleConnectionParameter -ConnectionID $ConnectionList.identifier 
-            $ConnectionList | Add-Member -MemberType NoteProperty -Name ConnectionParameter -Value $ConnectionParameter
+            if ( $IncludeConnectionParameter) {
+                $ConnectionParameter = Get-GuacamoleConnectionParameter -ConnectionID $ConnectionList.identifier 
+                $ConnectionList | Add-Member -MemberType NoteProperty -Name ConnectionParameter -Value $ConnectionParameter
+            }
         }
         Else {
             $ConnectionList = Foreach ( $Property in $WebResponse.psobject.properties.Name ) {
                 $Connection = @( Get-GuacamoleAttributes -Object ( $WebResponse.( $Property )) -ShowEmptyAttributes:$ShowEmptyAttributes )
-                $ConnectionParameter = Get-GuacamoleConnectionParameter -ConnectionID $Connection.identifier 
-                $Connection | Add-Member -MemberType NoteProperty -Name ConnectionParameter -Value $ConnectionParameter
+                if ( $IncludeConnectionParameter ) {
+                    $ConnectionParameter = Get-GuacamoleConnectionParameter -ConnectionID $Connection.identifier 
+                    $Connection | Add-Member -MemberType NoteProperty -Name ConnectionParameter -Value $ConnectionParameter
+                }
                 $Connection
             }
         }
-        $ConnectionList
+        If ( $ConnectionName ) {
+            $ConnectionList | Where-Object -FilterScript { $_.name -in $ConnectionName }
+        }
+        Else {
+            $ConnectionList
+        }
     }
 }
