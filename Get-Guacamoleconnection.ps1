@@ -31,7 +31,7 @@ Function Get-GuacamoleConnection {
 
         # Filter for the Protocol-Type
         [ValidateSet('rdp','vnc','ssh','telnet','kubernetes')]
-        [string[]]$Protocol = @('rdp,vnc','ssh','telnet','kubernetes'),
+        [string[]]$Protocol = @('rdp','vnc','ssh','telnet','kubernetes'),
         
         # List all Attributes as Object Properties, even empty ones. If you use this parameter, you 
         # may break the Pipeline-Functionality.
