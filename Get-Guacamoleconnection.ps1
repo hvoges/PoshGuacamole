@@ -14,16 +14,24 @@ Function Get-GuacamoleConnection {
 #>
     [CmdletBinding(DefaultParameterSetName='All')]
     param(
+        # The Connection-ID is a unique numerical identifier. You can either
+        # filter for the Connection-ID or a Connection-Name
         [Parameter(Mandatory,
                    ValueFromPipeline,
                    ValueFromPipelineByPropertyName,
                    ParameterSetName='ByID')]
         [string]$ConnectionID,
 
+        # The Name of the connection. You can either filter by name or by
+        # Connection-ID 
         [Parameter(ValueFromPipeline,
                    ValueFromPipelineByPropertyName,
                    ParameterSetName='ByName')]
         [string[]]$ConnectionName,
+
+        # Filter for the Protocol-Type
+        [ValidateSet('rdp','vnc','ssh','telnet','kubernetes')]
+        [string[]]$Protocol = @('rdp,vnc','ssh','telnet','kubernetes'),
         
         # List all Attributes as Object Properties, even empty ones. If you use this parameter, you 
         # may break the Pipeline-Functionality.
@@ -53,7 +61,8 @@ Function Get-GuacamoleConnection {
         }
 
         If ( $WebResponse.Name ) {
-            $ConnectionList = @( Get-GuacamoleAttributes -Object $WebResponse -ShowEmptyAttributes:$ShowEmptyAttributes )
+            $ConnectionList = @( Get-GuacamoleAttributes -Object $WebResponse -ShowEmptyAttributes:$ShowEmptyAttributes | 
+                Where-Object -FilterScript { $_.protocol -in $protocol } )
             if ( $IncludeConnectionParameter) {
                 $ConnectionParameter = Get-GuacamoleConnectionParameter -ConnectionID $ConnectionList.identifier 
                 $ConnectionList | Add-Member -MemberType NoteProperty -Name ConnectionParameter -Value $ConnectionParameter
@@ -61,7 +70,8 @@ Function Get-GuacamoleConnection {
         }
         Else {
             $ConnectionList = Foreach ( $Property in $WebResponse.psobject.properties.Name ) {
-                $Connection = @( Get-GuacamoleAttributes -Object ( $WebResponse.( $Property )) -ShowEmptyAttributes:$ShowEmptyAttributes )
+                $Connection = @( Get-GuacamoleAttributes -Object ( $WebResponse.( $Property )) -ShowEmptyAttributes:$ShowEmptyAttributes | 
+                    Where-Object -FilterScript { $_.protocol -in $protocol }  )
                 if ( $IncludeConnectionParameter ) {
                     $ConnectionParameter = Get-GuacamoleConnectionParameter -ConnectionID $Connection.identifier 
                     $Connection | Add-Member -MemberType NoteProperty -Name ConnectionParameter -Value $ConnectionParameter
