@@ -22,6 +22,11 @@ Function Set-GuacamoleRdpConnection {
     #> 
     [CmdletBinding(SupportsShouldProcess)]    
     param(
+        # The Name of the RDP-Host
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName)]
+        [Alias('Computername','Host','Computer')]                   
+        [string]$Hostname,
+
         # The Name of the Connection, will be used as default for the Host-Name if none is given
         [Parameter(ValueFromPipelineByPropertyName)]
         [Alias('Name','Connection')]                   
