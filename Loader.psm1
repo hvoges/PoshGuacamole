@@ -5,3 +5,5 @@ foreach ( $Script in $ScriptList )
 {
     . $Script.Fullname
 }
+
+Export-ModuleMember -Function * -Variable keyboardCodes
