@@ -31,7 +31,7 @@ Function ConvertTo-HashTable {
                 $InputObject = ConvertFrom-Json -InputObject $JsonString
             }
             $Hashtable = @{}
-            Foreach ( $Property in $Object.psobject.Properties )
+            Foreach ( $Property in $InputObject.psobject.Properties )
             {
                 $Hashtable.add( $property.Name, $property.Value )
             }
