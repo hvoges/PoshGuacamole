@@ -1,4 +1,4 @@
-Function ConvertFrom-JsonToHashTable {
+Function ConvertTo-HashTable {
     <#
     .SYNOPSIS
         Converts Json to Hashtable
@@ -12,16 +12,26 @@ Function ConvertFrom-JsonToHashTable {
         Date: 2022-21-02
     #>    
         param(
+            # Json-String to Convert
             [Parameter(Mandatory,
-                       ValueFromPipeline)]
+                       ValueFromPipeline,
+                       ParameterSetName='Json')]
             [Alias('LastActive')]                   
-            [String]$JsonString
+            [String]$JsonString,
+
+            [Parameter(Mandatory,
+                       ValueFromPipeline,
+                       ParameterSetName='Object')]
+            # Powershell-Object to Convert
+            [PSObject]$InputObject 
         )    
         
         Process {    
-            $JsonAsObject = ConvertFrom-Json -InputObject $JsonString
+            if ( $JsonString ) {
+                $InputObject = ConvertFrom-Json -InputObject $JsonString
+            }
             $Hashtable = @{}
-            Foreach ( $Property in $JsonAsObject.psobject.Properties )
+            Foreach ( $Property in $Object.psobject.Properties )
             {
                 $Hashtable.add( $property.Name, $property.Value )
             }
