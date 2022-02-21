@@ -15,17 +15,14 @@ Function Remove-GuacamoleConnection {
 #>    
     param(
         # The ID of the Connection you want to remove
-        [Parameter(Mandatory,
-                   ValueFromPipeline,
-                   ValueFromPipelineByPropertyName,
-                   ParameterSetName="ById")]
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [Alias('Identifier')]
         [string]$ConnectionID,
 
         # The Name of the Connection you want to remove
-        [Parameter(Mandatory,
-                   ValueFromPipeline,
-                   ValueFromPipelineByPropertyName,
-                   ParameterSetName="ByName")]
+        [Parameter(ValueFromPipeline,
+                   ValueFromPipelineByPropertyName)]
+        [Alias('name')]
         [string]$ConnectionName,
 
         [Parameter(DontShow)]
@@ -33,13 +30,17 @@ Function Remove-GuacamoleConnection {
     )
 
     Begin {
-        If ( $PSCmdlet.ParameterSetName -eq "ByName" )
-        {
             $connections = Get-GuacamoleConnection
-        }
     }
 
     Process {
+        if (( ! $ConnectionID ) -and (! $ConnectionName )) {
+            Throw "Please Call this Cmdlet with a Connection-ID or a Connection-Name"
+        }
+        ElseIf ( ! $ConnectionID ) {
+            $ConnectionID = ( $connections | Where-Object { $_.name -eq $Connectionname  } ).identifier
+        }
+
         Try {
             $EndPoint = '{0}/api/session/data/{1}/connections/{3}?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$ConnectionID
         }
