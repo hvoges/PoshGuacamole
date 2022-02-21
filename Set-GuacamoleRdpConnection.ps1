@@ -3,27 +3,26 @@ Function Set-GuacamoleRdpConnection {
     .SYNOPSIS
         Changes the Configuration of exisiting RDP-Connections
     .DESCRIPTION
-        
+        Set-GuacamoleRdpConnection can change all exisiting RDP-Connections. The Cmdlet changes only the given values, 
+        all current settings are kept. You have to enter the Connectionname or ID to identify the configuration you 
+        want to change. If you want to change the Configuration-Name, use the Configuration-ID as the Identifier.
+    .EXAMPLE
+        PS C:\> Set-GuacamoleRdpConnection -ConnectionName Server1 -ServerLayout English_US -IgnoreCertificateWarning $true
+        This Example changes the Connection named Server1. The Serverlayout is changed to English (US) and Certificate-Warnings
+        will be ignored. 
     .EXAMPLE
         PS C:\> $Password = Convertto-Securestring -String "2manySecrets!" -AsPlainText -force
         PS C:\> Set-GuacamoleRdpConnection -Hostname Server1 -Username Administrator -Password $Password
-        This Command creates a new RDP-Connection-Setting with the given values. Username and Password are
-        the names with which Guacamole will log in to the Remote Computer. The Connection will automatically
-        be named after the Computer.
-    .EXAMPLE
-        PS C:\> $Password = Convertto-Securestring -String "2manySecrets!" -AsPlainText -force
-        PS C:\> New-GuacamoleRdpConnection -Hostname Server1 -Username Administrator -Password $Password -OtherProperties @{"initial-program"="C:\windows\Notepad.exe"}
-        This Command will set the inital programm. You can add further Properties inside the hashtable, but 
-        the key-value-Pairs have to be separated by a semi-colon, eg. @{"sftp-username"="john";"sftp-password"="TopSecret!"}
+        These Command will will set the RDP-Username to Administrator and the Password to 2manySecrets!
     .NOTES
         Author: Holger Voges
         Version: 1.0 
-        Date: 2021-11-13
+        Date: 2022-02-21
     #> 
     [CmdletBinding(SupportsShouldProcess)]    
     param(
         # The Name of the RDP-Host
-        [Parameter(Mandatory,ValueFromPipelineByPropertyName)]
+        [Parameter(ValueFromPipelineByPropertyName)]
         [Alias('Computername','Host','Computer')]                   
         [string]$Hostname,
 
@@ -52,7 +51,7 @@ Function Set-GuacamoleRdpConnection {
 
         # The domain to use when attempting authentication. Use Localhost if you want to authenticate locally. 
         [Parameter(ValueFromPipelineByPropertyName)]
-        [string]$Domain,
+        [string]$UserDomain,
 
         # The Keyboard-Layout
         [Parameter(ValueFromPipelineByPropertyName)]
@@ -382,7 +381,7 @@ Function Set-GuacamoleRdpConnection {
         if ( $ConnectionID ) {
             $Connection = $ConnectionList | Where-Object -FilterScript { $_.identifier -eq $ConnectionID }
         }
-        elseif ( $Connectionname ) {
+        elseif ( $ConnectionName ) {
             $Connection = $ConnectionList | Where-Object -FilterScript { $_.name -eq $Connectionname }
         }
         Else {
@@ -507,7 +506,7 @@ Function Set-GuacamoleRdpConnection {
         # Create a new JSON Request-Body from the entered Values
         $ConnectionHashTable = [ordered]@{
             parentIdentifier = $Connection.parentIdentifier
-            name = $Connection.name
+            name = if ($ConnectionName) { $ConnectionName } else { $Connection.name }
             identifier = $Connection.identifier
             protocol = "rdp"
             parameters = $ConnectionParameter
