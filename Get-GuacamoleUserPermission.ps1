@@ -39,11 +39,5 @@ Function Get-GuacamoleUserPermission {
         Catch {
             Throw $_
         }
-        $PermissionObject = New-Object -TypeName PSCustomObject
-        Foreach ( $Property in $Permissions.psobject.properties ) {
-            $PermissionList = Get-GuacamoleAttributes -Object ( $Permissions.($Property.Name) )
-            Add-Member -InputObject $PermissionObject -MemberType NoteProperty -Name $Property.name -Value $PermissionList 
-        } 
-        $PermissionObject
     }
 }
