@@ -12,7 +12,7 @@
 RootModule = 'loader.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2'
+ModuleVersion = '0.3.0.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -27,13 +27,14 @@ Author = 'Holger Voges'
 CompanyName = 'Netz-Weise IT-Schulungen'
 
 # Copyright statement for this module
-Copyright = '2021 by Holger Voges, GPL v3'
+Copyright = '2021,2022 by Holger Voges, GPL v3'
 
 # Description of the functionality provided by this module
-Description = 'Apache Guacamole Automation Module'
+Description = 'Apache Guacamole Automation Module
+This module uses the Guacamole Rest API to automate User- and Connection-Management.'
 
 # Minimum version of the PowerShell engine required by this module
-# PowerShellVersion = ''
+# PowerShellVersion = '5.0'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
@@ -69,16 +70,16 @@ Description = 'Apache Guacamole Automation Module'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = '*'
+FunctionsToExport = 'Add-GuacamoleGroupMember','Add-GuacamoleUserConnection','Connect-Guacamole','Disconnect-Guacamole','Get-GuacamoleConnection','Get-GuacamoleConnectionParameter','Get-GuacamoleGroupMember','Get-GuacamoleUser','Get-GuacamoleUserConnection','Get-GuacamoleUserGroup','Get-GuacamoleUserHistory','Get-GuacamoleUserPermission','New-GuacamoleRdpConnection','New-GuacamoleUser','New-GuacamoleUserGroup','Remove-GuacamoleAuthToken','Remove-GuacamoleConnection','Remove-GuacamoleGroupMember','Remove-GuacamoleUser','Remove-GuacamoleUserConnection','Remove-GuacamoleUserGroup','Set-GuacamoleRdpConnection','Set-GuacamoleUser','Set-GuacamoleUserGroup','Set-GuacamoleUserPassword'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = '*'
+CmdletsToExport = @()
 
 # Variables to export from this module
-VariablesToExport = 'keyboardCodes'
+VariablesToExport = @()
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = '*'
+AliasesToExport = @()
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()
