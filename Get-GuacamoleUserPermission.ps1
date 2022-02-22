@@ -26,10 +26,10 @@ Function Get-GuacamoleUserPermission {
 
     Process {
         If ( $EffectivePermissions ) {
-            $EndPoint = '{0}/api/session/data/{1}/users/{3}/effectivePermissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$AuthToken.Username    
+            $EndPoint = '{0}/api/session/data/{1}/users/{3}/effectivePermissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$Username    
         }
         Else {
-            $EndPoint = '{0}/api/session/data/{1}/users/{3}/permissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$AuthToken.Username
+            $EndPoint = '{0}/api/session/data/{1}/users/{3}/permissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$Username
         }
 
         Write-Verbose $Endpoint
