@@ -95,7 +95,7 @@ Function Set-GuacamoleUser {
       "AccessWindowEnd"    { $User.attributes."access-window-end"        = $AccessWindowEnd.ToString("T") }
       "ValidFrom"          { $User.attributes."valid-from"               = "{0:yyyy-MM-dd}" -f $ValidFrom }
       "ValidUntil"         { $User.attributes."valid-until"              = "{0:yyyy-MM-dd}" -f $ValidUntil }
-      "TimeZone"           { $User.attributes."timezone"                 = ([String]$TimeZone).replace("_","/") }
+      "TimeZone"           { $User.attributes."timezone"                 = $TimeZones."$TimeZone" }
       "Fullname"           { $User.attributes."guac-full-name"           = $Fullname }
       "Organization"       { $User.attributes."guac-organization"        = $Organization }
       "OrganizationalRole" { $User.attributes."guac-organizational-role" = $OrganizationalRole }

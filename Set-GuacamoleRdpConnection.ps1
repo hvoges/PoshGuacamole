@@ -422,7 +422,7 @@ Function Set-GuacamoleRdpConnection {
             "InitialProgram"             { $connectionParameter."initial-program"            = $InitialProgram }
             "ClientName"                 { $connectionParameter."client-name"                = $ClientName }
             "ServerLayout"               { $connectionParameter."server-layout"              = $KeyboardCodes."$ServerLayout" }
-            "Timezone"                   { $connectionParameter."timezone"                   = $Timezone }
+            "Timezone"                   { $connectionParameter."timezone"                   = $Timezones."$TimeZone" }
             "ConnectToConsole"           { $connectionParameter."console"                    = $ConnectToConsole }
             # SreenparametersParameter  
             "ScreenWidth"                { $connectionParameter."width"                      = $ScreenWidth }
