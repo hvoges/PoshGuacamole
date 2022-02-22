@@ -15,16 +15,11 @@ Function Disconnect-Guacamole {
     param(
         
       # The authentication-Token, when a local Token was used  
-      $AuthToken,
+      $AuthToken = $GuacAuthToken,
 
       # Returns the Disconnect-Response from the Web-Server 
       [Switch]$Passthru
     )
-
-    If (! $AuthToken)
-    {
-      $AuthToken = $GuacAuthToken
-    }
 
     $EndPoint = '{0}/api/session/data/{1}/users/{3}/permissions?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$AuthToken.username
 
