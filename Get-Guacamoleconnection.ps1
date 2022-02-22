@@ -24,7 +24,8 @@ Function Get-GuacamoleConnection {
 
         # The Name of the connection. You can either filter by name or by
         # Connection-ID 
-        [Parameter(ValueFromPipeline,
+        [Parameter(Position=0,
+                   ValueFromPipeline,
                    ValueFromPipelineByPropertyName,
                    ParameterSetName='ByName')]
         [string[]]$ConnectionName,
