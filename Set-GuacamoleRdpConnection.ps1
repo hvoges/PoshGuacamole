@@ -363,6 +363,7 @@ Function Set-GuacamoleRdpConnection {
         [validateSet('ssl','none')]
         [string]$GuacdEncryption,
         
+        [Parameter(DontShow)]        
         $AuthToken = $GuacAuthToken
     )
  

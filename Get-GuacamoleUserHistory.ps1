@@ -18,6 +18,7 @@ Function Get-GuacamoleUserHistory {
                    ValueFromPipelineByPropertyName)]
         [string]$Username,
 
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 

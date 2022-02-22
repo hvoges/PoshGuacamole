@@ -64,6 +64,7 @@ Function New-GuacamoleUser {
 
         [switch]$Passthru,
 
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 

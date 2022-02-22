@@ -20,6 +20,7 @@ Function Get-GuacamoleUserPermission {
 
         [Switch]$EffectivePermissions,
 
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 

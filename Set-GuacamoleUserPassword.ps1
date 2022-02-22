@@ -25,6 +25,7 @@ Function Set-GuacamoleUserPassword {
                    ValueFromPipelineByPropertyName)]
         [SecureString]$Password,
 
+        [Parameter(DontShow)]        
         $AuthToken = $GuacAuthToken
     )
 

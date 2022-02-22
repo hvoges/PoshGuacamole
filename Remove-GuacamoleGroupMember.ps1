@@ -13,12 +13,12 @@ Function Remove-GuacamoleGroupMember {
     Date: 2021-11-13
 #>  
     param(
-        [Parameter(Mandatory)]
-        $AuthToken = $GuacAuthToken,
-
         [string]$Groupname,
 
-        [string]$Username        
+        [string]$Username,
+
+        [Parameter(DontShow)]
+        $AuthToken = $GuacAuthToken
     )
 
 $Command = @"

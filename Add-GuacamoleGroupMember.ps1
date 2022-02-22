@@ -21,6 +21,7 @@ Function Add-GuacamoleGroupMember {
                    ValueFromPipeline)]
         [string]$Username,
 
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 

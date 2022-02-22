@@ -19,9 +19,16 @@ Function Add-GuacamoleUserConnection {
         [string]$Username,
 
         [Parameter(Mandatory,
-                   ValueFromPipelineByPropertyName)]
+                   ValueFromPipelineByPropertyName,
+                   ParameterSetName='ByID')]
         [string]$ConnectionID,
 
+        [Parameter(Mandatory,
+                   ValueFromPipelineByPropertyName
+                   ParameterSetName='ByName')]
+        [string]$ConnectionName,
+
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 

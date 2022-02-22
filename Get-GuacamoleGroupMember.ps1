@@ -18,6 +18,7 @@ Function Get-GuacamoleGroupMember {
                    ValueFromPipelineByPropertyName)]
         [string]$Username,
 
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 

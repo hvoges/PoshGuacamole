@@ -24,6 +24,7 @@ Function Get-GuacamoleUserGroup {
         # Returns the Raw JSON-String
         [Switch]$Raw,
 
+        [Parameter(DontShow)]
         $AuthToken = $GuacAuthToken
     )
 
