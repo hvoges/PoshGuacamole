@@ -19,7 +19,7 @@ Function New-GuacamoleUser {
 
         [Parameter(Mandatory,
                    ValueFromPipelineByPropertyName)]
-        [string]$Password,
+        [securestring]$Password,
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [string]$EmailAddress,
@@ -71,7 +71,7 @@ Function New-GuacamoleUser {
   Process {
     $user = [ordered]@{
       username = $Username
-      password = $Password
+      password = [PSCredential]::new('Demo',$Password).GetNetworkCredential().Password
       attributes = [ordered]@{
       }
     }
