@@ -41,6 +41,7 @@ Function Get-GuacamoleUserConnection {
         {
             $Connection = $ConnectionList | Where-Object -FilterScript { $_.identifier -eq $ConnectionPerms.Name } 
             [PSCustomObject]@{
+                UserName = $Username
                 ParentIdentifier = $Connection.ParentIdentifier
                 Identifier = $ConnectionPerms.Name 
                 ConnectionName = ( $ConnectionList | Where-Object -FilterScript { $_.identifier -eq $ConnectionPerms.Name } ).Name
