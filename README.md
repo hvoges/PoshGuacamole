@@ -10,7 +10,7 @@ My Thanks go to Adicitus who made me aware of the Web-Api and who has his own Pr
 
 ## Usage
 
-Before you can use the cmdlets, you first have to authorize. This what Connect-Guacamole does for you. The cmdlet creates a Session-Token which will be stored in a Script-Variable and is not accessible outside of the Cmdlet. If you need the session-Token for Authenticatin outside the module, you can use the *-Passthru* Parameter.
+Before you can use the cmdlets, you first have to authorize. This is what Connect-Guacamole does for you. The cmdlet creates a Session-Token which will be stored in a Script-Variable and is not accessible outside of the Cmdlet. If you need the session-Token for Authenticatin outside the module, you can use the *-Passthru* Parameter.
 
 ```powershell
 $Credential = Get-Credential
