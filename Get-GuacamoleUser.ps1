@@ -9,13 +9,21 @@ Function Get-GuacamoleUser {
     Returns all Guacamole-Users
 .NOTES
     Author: Holger Voges
-    Version: 1.1
-    Date: 2022-01-15
+    Version: 1.2
+    Date: 2022-05-22
 #>    
-    param(
+    [CmdletBinding(DefaultParameterSetName='UserName')]
+    param(        
         [Parameter(ValueFromPipeline,
-                   ValueFromPipelineByPropertyName)]
-        [string]$Username,
+                   ValueFromPipelineByPropertyName,
+                   ParametersetName = 'Username')]
+        [String]$Username,
+
+        # Filter for Usernames. The filter takes a regular expression as input.
+        [Parameter(ValueFromPipeline,
+                   ValueFromPipelineByPropertyName,
+                   ParametersetName = 'Filter')]
+        [String]$Filter,
 
         # List all Attributes as Object Properties, even empty ones. If you use this parameter, you 
         # may break the Pipeline-Functionality.
@@ -28,14 +36,8 @@ Function Get-GuacamoleUser {
         $AuthToken = $GuacAuthToken
     )
 
-    Process {
-        if ( $Username ) {
-            $EndPoint = '{0}/api/session/data/{1}/users/{3}?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken,$Username
-        } 
-        else {
-            $EndPoint = '{0}/api/session/data/{1}/users?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken
-        }
-
+    Begin {
+        $EndPoint = '{0}/api/session/data/{1}/users?token={2}' -f $AuthToken.HostUrl,$AuthToken.datasource,$AuthToken.authToken
         Write-Verbose $Endpoint
         Try {
             $WebResponse = Invoke-WebRequest -UseBasicParsing -Uri $EndPoint -ErrorAction Stop
@@ -43,16 +45,31 @@ Function Get-GuacamoleUser {
         Catch {
             Throw $_.Exception.Message
         }
-        $UserList = $WebResponse | ConvertFrom-Json 
+        $UserList = $WebResponse | ConvertFrom-Json         
+    }
+
+    Process {
+        # return only the json-answer
         if ( $Raw ) { 
             $WebResponse.Content
          }
-        elseif ( $UserList.username ) {
-            Get-GuacamoleAttributes -Object $UserList -ShowEmptyAttributes:$ShowEmptyAttributes
+        elseif ( $Username ) {
+            $User = $UserList.$Username
+            Get-GuacamoleAttributes -Object $User -ShowEmptyAttributes:$ShowEmptyAttributes
+        }
+        elseif ( $PSCmdlet.ParameterSetName -eq 'Filter' ) {
+            # Because all Users are single Properties of Object UserList, filter all Properties which match $filter
+            $Usernames = $UserList.psobject.properties.name | 
+                Where-Object { $_ -match $Filter }
+            $FilteredUserList = $UserList | Select-Object -Property $Usernames
+            Foreach ( $User in $Usernames )
+            {
+                Get-GuacamoleAttributes -Object $UserList.$user -ShowEmptyAttributes:$ShowEmptyAttributes
+            }
         }
         Else {
-            Foreach ( $Property in $UserList.psobject.properties.Name ) {
-                Get-GuacamoleAttributes -Object $UserList.$Property -ShowEmptyAttributes:$ShowEmptyAttributes
+            Foreach ( $User in $UserList.psobject.properties.Name ) {
+                Get-GuacamoleAttributes -Object $UserList.$User -ShowEmptyAttributes:$ShowEmptyAttributes
             }        
         }
     }
