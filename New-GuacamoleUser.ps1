@@ -51,7 +51,7 @@ Function New-GuacamoleUser {
         [DateTime]$AccessWindowEnd,
 
         [Parameter(ValueFromPipelineByPropertyName)]
-        [GuacamoleTimeZones]$TimeZone,
+        [GuacamoleTimeZones]$TimeZone = = 'Europe_Berlin',
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [String]$Fullname,
