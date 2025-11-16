@@ -19,6 +19,7 @@
 . $PSScriptRoot\Get-GuacamoleUserHistory.ps1
 . $PSScriptRoot\Get-GuacamoleUserPermission.ps1
 . $PSScriptRoot\New-GuacamoleRdpConnection.ps1
+. $PSScriptRoot\New-GuacamoleConnectionGroup.ps1
 . $PSScriptRoot\New-GuacamoleUser.ps1
 . $PSScriptRoot\New-GuacamoleUserGroup.ps1
 . $PSScriptRoot\Remove-GuacamoleAuthToken.ps1
@@ -32,4 +33,4 @@
 . $PSScriptRoot\Set-GuacamoleUserGroup.ps1
 . $PSScriptRoot\Set-GuacamoleUserPassword.ps1
 
-Export-ModuleMember -Function 'Add-GuacamoleGroupMember','Add-GuacamoleUserConnection','Connect-Guacamole','Disconnect-Guacamole','Get-GuacamoleConnection','Get-GuacamoleConnectionParameter','Get-GuacamoleGroupMember','Get-GuacamoleUser','Get-GuacamoleUserConnection','Get-GuacamoleUserGroup','Get-GuacamoleUserHistory','Get-GuacamoleUserPermission','New-GuacamoleRdpConnection','New-GuacamoleUser','New-GuacamoleUserGroup','Remove-GuacamoleAuthToken','Remove-GuacamoleConnection','Remove-GuacamoleGroupMember','Remove-GuacamoleUser','Remove-GuacamoleUserConnection','Remove-GuacamoleUserGroup','Set-GuacamoleRdpConnection','Set-GuacamoleUser','Set-GuacamoleUserGroup','Set-GuacamoleUserPassword'
+Export-ModuleMember -Function 'Add-GuacamoleGroupMember','Add-GuacamoleUserConnection','Connect-Guacamole','Disconnect-Guacamole','Get-GuacamoleConnection','Get-GuacamoleConnectionParameter','Get-GuacamoleGroupMember','Get-GuacamoleUser','Get-GuacamoleUserConnection','Get-GuacamoleUserGroup','Get-GuacamoleUserHistory','Get-GuacamoleUserPermission','New-GuacamoleConnectionGroup','New-GuacamoleRdpConnection','New-GuacamoleUser','New-GuacamoleUserGroup','Remove-GuacamoleAuthToken','Remove-GuacamoleConnection','Remove-GuacamoleGroupMember','Remove-GuacamoleUser','Remove-GuacamoleUserConnection','Remove-GuacamoleUserGroup','Set-GuacamoleRdpConnection','Set-GuacamoleUser','Set-GuacamoleUserGroup','Set-GuacamoleUserPassword'
